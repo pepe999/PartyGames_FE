@@ -87,7 +87,7 @@ class ApiService {
     return response.data.data.rooms.map(room => ({
       id: room.id,
       name: room.name,
-      code: room.roomCode,
+      code: room.code,
       gameType: room.gameType,
       status: room.status,
       maxPlayers: room.maxPlayers,

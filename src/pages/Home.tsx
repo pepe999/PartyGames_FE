@@ -89,11 +89,10 @@ export const Home: React.FC = () => {
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                   DEV: Rychlé přihlášení pro testování
                 </p>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     onClick={() => handleDevLogin('Hráč 1')}
                     variant="secondary"
-                    fullWidth
                     size="sm"
                   >
                     Hráč 1
@@ -101,7 +100,6 @@ export const Home: React.FC = () => {
                   <Button
                     onClick={() => handleDevLogin('Hráč 2')}
                     variant="secondary"
-                    fullWidth
                     size="sm"
                   >
                     Hráč 2
@@ -109,10 +107,16 @@ export const Home: React.FC = () => {
                   <Button
                     onClick={() => handleDevLogin('Hráč 3')}
                     variant="secondary"
-                    fullWidth
                     size="sm"
                   >
                     Hráč 3
+                  </Button>
+                  <Button
+                    onClick={() => handleDevLogin('Hráč 4')}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    Hráč 4
                   </Button>
                 </div>
               </div>

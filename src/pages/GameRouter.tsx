@@ -20,13 +20,16 @@ export const GameRouter: React.FC = () => {
 
       try {
         const room = await apiService.getRoom(roomId);
-        // Zjistit typ hry z místnosti nebo z Game objektu
-        // Pokud je to kvízová hra (např. "Máme rádi Česko"), použít QuizGame
-        // Jinak použít Game (pro Word hry)
+        // Zjistit typ hry podle gameType (slug)
+        // PANTOMIMA -> používá Game komponentu s word-show eventi
+        // Pro budoucí kvízové hry (QUESTION content) -> QuizGame
 
-        // Prozatím zkontrolujeme podle názvu nebo kódu
-        // V budoucnu můžeme přidat do API informaci o typu obsahu (QUESTION vs WORD)
-        if (room.name?.includes('Česko') || room.name?.toLowerCase().includes('kvíz')) {
+        const gameSlug = room.gameType?.toLowerCase();
+        console.log('Game type for room:', gameSlug);
+
+        if (gameSlug === 'pantomima') {
+          setGameType('pantomima');
+        } else if (gameSlug === 'mame-radi-cesko' || room.name?.toLowerCase().includes('kvíz')) {
           setGameType('quiz');
         } else {
           setGameType('word');
@@ -54,5 +57,6 @@ export const GameRouter: React.FC = () => {
     return <QuizGame />;
   }
 
+  // Pantomima a word games používají Game komponentu
   return <Game />;
 };

@@ -115,6 +115,13 @@ export const Game: React.FC = () => {
       // Join room via socket (use roomCode, not roomId)
       socketService.emit('room:join', roomData.code);
 
+      // Request current game state (in case we missed the initial word-show event)
+      // Wait longer to ensure backend has set the current word
+      setTimeout(() => {
+        console.log('>>> Requesting game state for room:', roomData.code);
+        socketService.emit('game:get-state', roomData.code);
+      }, 2500);
+
       // Calculate team scores
       const teamScores: { [key: number]: number } = {};
       playersData.forEach((p) => {
@@ -130,6 +137,8 @@ export const Game: React.FC = () => {
   };
 
   const setupSocketListeners = () => {
+    console.log('Setting up socket listeners for Game component');
+
     // Word game events
     socketService.on('game:turn-started', handleTurnStarted);
     socketService.on('game:turn-ended', handleTurnEnded);
@@ -144,7 +153,10 @@ export const Game: React.FC = () => {
     socketService.on('answer-submitted', handleAnswerSubmitted);
 
     // Pantomima events
-    socketService.on('word-show', handleWordShow);
+    socketService.on('word-show', (data) => {
+      console.log('>>> WORD-SHOW EVENT RECEIVED:', data);
+      handleWordShow(data);
+    });
     socketService.on('round-end', handleRoundEnd);
   };
 

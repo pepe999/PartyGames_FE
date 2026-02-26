@@ -120,8 +120,14 @@ export const Room: React.FC = () => {
         hasJoinedRef.current = true;
         try {
           const newPlayer = await apiService.joinRoom(roomId, user.name || 'Anonymous', 'SPECTATOR', verifiedPassword);
-          // Add the player immediately to local state so the button works
-          setPlayers(prev => [...prev, newPlayer]);
+          // Add the player immediately to local state (with deduplication check)
+          setPlayers(prev => {
+            // Check if player already exists (might have been added via socket event)
+            if (prev.some(p => p.id === newPlayer.id || p.userId === newPlayer.userId)) {
+              return prev;
+            }
+            return [...prev, newPlayer];
+          });
         } catch (joinErr) {
           console.error('Failed to join room:', joinErr);
           hasJoinedRef.current = false; // Reset on error
@@ -151,13 +157,26 @@ export const Room: React.FC = () => {
     setRoom(updatedRoom);
   };
 
-  const handlePlayerJoined = async (player: RoomPlayer) => {
+  const handlePlayerJoined = async (player: RoomPlayer | any) => {
     setPlayers((prev) => {
       // Check if player already exists
-      if (prev.some(p => p.id === player.id)) {
+      if (prev.some(p => p.id === player.id || p.userId === (player.user?.id || player.userId))) {
         return prev;
       }
-      return [...prev, player];
+      // Transform socket event data to frontend format (backend sends team, frontend uses teamNumber)
+      const transformedPlayer: RoomPlayer = {
+        id: player.id,
+        userId: player.user?.id || player.userId || '',
+        roomId: player.roomId || '',
+        teamNumber: player.teamNumber ?? (player.team === 'A' ? 1 : player.team === 'B' ? 2 : 0),
+        score: player.score || 0,
+        isHost: player.isHost || false,
+        isReady: player.isReady || false,
+        isConnected: player.isConnected ?? true,
+        joinedAt: player.joinedAt,
+        user: player.user,
+      };
+      return [...prev, transformedPlayer];
     });
   };
 
